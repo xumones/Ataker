@@ -1,0 +1,10 @@
+C:\Users\toast\Desktop\Midterm_P\Ataker\Ataker\bin\Debug\Ataker.exe.config
+C:\Users\toast\Desktop\Midterm_P\Ataker\Ataker\bin\Debug\Ataker.exe
+C:\Users\toast\Desktop\Midterm_P\Ataker\Ataker\bin\Debug\Ataker.pdb
+C:\Users\toast\Desktop\Midterm_P\Ataker\Ataker\obj\Debug\Ataker.csproj.AssemblyReference.cache
+C:\Users\toast\Desktop\Midterm_P\Ataker\Ataker\obj\Debug\Ataker.Properties.Resources.resources
+C:\Users\toast\Desktop\Midterm_P\Ataker\Ataker\obj\Debug\Ataker.csproj.GenerateResource.cache
+C:\Users\toast\Desktop\Midterm_P\Ataker\Ataker\obj\Debug\Ataker.csproj.CoreCompileInputs.cache
+C:\Users\toast\Desktop\Midterm_P\Ataker\Ataker\obj\Debug\Ataker.exe
+C:\Users\toast\Desktop\Midterm_P\Ataker\Ataker\obj\Debug\Ataker.pdb
+C:\Users\toast\Desktop\Midterm_P\Ataker\Ataker\obj\Debug\Ataker.Form1.resources
