@@ -25,16 +25,13 @@ namespace Ataker
             int newX = X + deltaX;
             int newY = Y + deltaY;
 
-            if (newX >= 0 && newX < grid.GetLength(0) && newY >= 0 && newY < grid.GetLength(1))
+            if (!CheckCollision(newX, newY, grid))
             {
-                if(grid[newX, newY] == null)
-                {
-                    grid[X, Y] = null;
-                    X = newX;
-                    Y = newY;
-                    grid[X, Y] = this;
-                    return true;
-                }
+                grid[X, Y] = null;
+                X = newX;
+                Y = newY;
+                grid[X, Y] = this;
+                return true;
             }
             return false;
         }
@@ -49,6 +46,17 @@ namespace Ataker
             }
 
             Console.WriteLine(health.ToString()); //for debug
+        }
+
+        public bool CheckCollision(int newX, int newY, GameObject[,] grid)
+        {
+            if (newX < 0 || newX >= grid.GetLength(0) || newY < 0 || newY >= grid.GetLength(1)) //Check if it out of grid edge
+            {
+                return true;
+            }
+
+            bool isNotNull = (grid[newX, newY] != null); //Check if that place have object or not
+            return isNotNull;
         }
     }
 }

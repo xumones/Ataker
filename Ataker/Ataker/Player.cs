@@ -19,42 +19,66 @@ namespace Ataker
             int newX = X + deltaX;
             int newY = Y + deltaY;
 
-            if (newX >= 0 && newX < grid.GetLength(0) && newY >= 0 && newY < grid.GetLength(1))
+            // Check if something block or not
+            if (CheckCollision(newX, newY, grid))
             {
-                if (grid[newX, newY] != null && grid[newX, newY] is DocumentPile doc)
-                {
-                    doc.Move(deltaX, deltaY, grid);
-                }
+                Console.WriteLine("Collision detected, can't move.");
+                return false;
+            }
 
-                if (grid[newX, newY] != null && grid[newX, newY] is Monster mon)
-                {
-                    mon.Move(deltaX, deltaY, grid);
-                    mon.TakeDamage(grid);
+            // Check if it DocumentPile or not
+            if (grid[newX, newY] is DocumentPile doc)
+            {
+                bool docMoved = doc.Move(deltaX, deltaY, grid);
+                if (!docMoved) return false; // if doc can't move then player can't move too
+            }
 
-                    if (mon.health <= 0) // ถ้ามอนสเตอร์ตาย
+            // Check if it Monster or not
+            if (grid[newX, newY] is Monster mon)
+            {
+                mon.Move(deltaX, deltaY, grid);
+                mon.TakeDamage(grid);
+
+                if (mon.health <= 0)
+                {
+                    bool monsterBlocked = !CheckCollision(newX, newY, grid);
+                    if (monsterBlocked)
                     {
-                        bool monsterBlocked =
-                            (newX + deltaX < 0 || newX + deltaX >= grid.GetLength(0)) ||
-                            (newY + deltaY < 0 || newY + deltaY >= grid.GetLength(1)) ||
-                            (grid[newX + deltaX, newY + deltaY] != null); // something block behind
-
-                        if (monsterBlocked)
-                        {
-                            return true; //Player stand still
-                        }
+                        return true; // player stand still
                     }
                 }
-
-                if (grid[newX, newY] == null) // ตรวจสอบว่าตำแหน่งใหม่ไม่ใช่กำแพง
-                {
-                    grid[X, Y] = null; // ลบตำแหน่งเดิมออกจาก grid
-                    X = newX;
-                    Y = newY;
-                    grid[X, Y] = this;
-                    return true; // ย้ายได้
-                }
             }
-            return false; // ย้ายไม่ได้
+
+            // Check if it empty space
+            if (grid[newX, newY] == null)
+            {
+                grid[X, Y] = null;
+                X = newX;
+                Y = newY;
+                grid[X, Y] = this;
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool CheckCollision(int newX, int newY, GameObject[,] grid)
+        {
+            // Check if it out of grid edge
+            if (newX < 0 || newX >= grid.GetLength(0) || newY < 0 || newY >= grid.GetLength(1))
+            {
+                Console.WriteLine("Out of bounds collision.");
+                return true;
+            }
+
+            // Check if that place is a wall (NOT EMPTY SPACE , NOT DOCUMENTPILE, NOT MONSTER = wall) (Grid edge already check)
+            if (grid[newX, newY] != null && !(grid[newX, newY] is DocumentPile) && !(grid[newX, newY] is Monster))
+            {
+                Console.WriteLine("Obstacle detected.");
+                return true;
+            }
+
+            return false; // Can move
         }
 
         public override void Draw(Graphics g, int tileSize)
