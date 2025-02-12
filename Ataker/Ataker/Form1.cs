@@ -44,6 +44,14 @@ namespace Ataker
             grid[2, 2] = new Wall(2, 2);
             grid[3, 3] = new Wall(3, 3);
 
+            // Create Obstacle
+            grid[1, 1] = new DocumentPile(1, 1);
+            grid[4, 4] = new DocumentPile(4, 4);
+
+            // Create Monster
+            grid[5, 1] = new Monster(5, 1, 3); // x,y,health
+            grid[6, 3] = new Monster(6, 3, 3); // x,y,health
+
             Invalidate(); // Redraw the form
         }
 
@@ -65,7 +73,7 @@ namespace Ataker
                 Invalidate(); // Redraw screen after move
             }
         }
-        
+
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
@@ -81,6 +89,10 @@ namespace Ataker
                         g.FillRectangle(Brushes.DarkGray, tile); // Draw wall
                     else if (grid[x, y] is Player)
                         g.FillRectangle(Brushes.Red, tile); // Draw player
+                    else if (grid[x, y] is DocumentPile)
+                        g.FillRectangle(Brushes.Blue, tile);
+                    else if (grid[x, y] is Monster)
+                        g.FillRectangle(Brushes.LightBlue, tile);
                     else
                         g.DrawRectangle(Pens.Black, tile); // Draw empty grid
                 }
