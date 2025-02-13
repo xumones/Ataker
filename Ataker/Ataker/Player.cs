@@ -36,16 +36,22 @@ namespace Ataker
             // Check if it Monster or not
             if (grid[newX, newY] is Monster mon)
             {
-                mon.Move(deltaX, deltaY, grid);
+                bool monsterCanMove = mon.Move(deltaX, deltaY, grid); // Monster move and check if it can move or not
                 mon.TakeDamage(grid);
-
                 if (mon.health <= 0)
                 {
-                    bool monsterBlocked = !CheckCollision(newX, newY, grid);
+                    bool monsterBlocked = CheckCollision(newX + deltaX, newY + deltaY, grid); // Check behind monster
                     if (monsterBlocked)
                     {
-                        return true; // player stand still
+                        Console.WriteLine("Monster stuck against a wall, Player cannot move.");
+                        return true;
                     }
+                }
+
+                if (!monsterCanMove) // if not then player can't move too
+                {
+                    Console.WriteLine("Monster is stuck, Player cannot move.");
+                    return true;
                 }
             }
 
