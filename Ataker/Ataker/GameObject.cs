@@ -11,11 +11,13 @@ namespace Ataker
     {
         public int X { get; protected set; }
         public int Y { get; protected set; }
+        public int Z { get; protected set; }
 
-        public GameObject(int x, int y)
+        public GameObject(int x, int y, int z)
         {
             X = x;
             Y = y;
+            Z = z;
         }
 
         public abstract void Draw(Graphics g, int tileSize);

@@ -8,7 +8,7 @@ namespace Ataker
 {
     public interface Moveable
     {
-        bool Move(int deltaX, int deltaY, GameObject[,] grid);
-        bool CheckCollision(int x, int y, GameObject[,] grid);
+        bool Move(int deltaX, int deltaY, int layer, GameObject[,,] grid);
+        bool CheckCollision(int x, int y, int layer, GameObject[,,] grid);
     }
 }

@@ -8,9 +8,10 @@ namespace Ataker
     {
         private const int GridWidth = 10;
         private const int GridHeight = 5;
+        private const int Layer = 2;
         private const int TileSize = 154;
 
-        private GameObject[,] grid = new GameObject[GridWidth, GridHeight]; // ใช้ Object แทนตัวเลข
+        private GameObject[,,] grid = new GameObject[GridWidth, GridHeight,Layer];
         private Player player;
 
         private void Form1_Load(object sender, EventArgs e)
@@ -34,23 +35,27 @@ namespace Ataker
             // Clear grid
             for (int y = 0; y < GridHeight; y++)
                 for (int x = 0; x < GridWidth; x++)
-                    grid[x, y] = null;
+                    for (int l = 0; l < Layer; l++)
+                        grid[x, y, l] = null;
 
             // Create player
-            player = new Player(0, 0);
-            grid[player.X, player.Y] = player;
+            player = new Player(0, 0, 1);
+            grid[player.X, player.Y, 1] = player;
 
             // Create walls
-            grid[2, 2] = new Wall(2, 2);
-            grid[3, 3] = new Wall(3, 3);
+            grid[2, 2, 1] = new Wall(2, 2, 1);
+            grid[3, 3, 1] = new Wall(3, 3, 1);
 
             // Create Obstacle
-            grid[1, 1] = new DocumentPile(1, 1);
-            grid[4, 4] = new DocumentPile(4, 4);
+            grid[1, 1, 1] = new DocumentPile(1, 1, 1);
+            grid[4, 4, 1] = new DocumentPile(4, 4, 1);
+
+            // Create Trap
+            grid[7, 3, 0] = new Trap(7, 3, 0);
 
             // Create Monster
-            grid[5, 1] = new Monster(5, 1, 3); // x,y,health
-            grid[6, 3] = new Monster(6, 3, 3); // x,y,health
+            grid[5, 1, 1] = new Monster(5, 1, 1, 3);
+            grid[6, 3, 1] = new Monster(6, 3, 1, 3);
 
             Invalidate(); // Redraw the form
         }
@@ -68,7 +73,7 @@ namespace Ataker
                 default: return;
             }
 
-            if (player.Move(deltaX, deltaY, grid))
+            if (player.Move(deltaX, deltaY, 1, grid))
             {
                 Invalidate(); // Redraw screen after move
             }
@@ -83,18 +88,23 @@ namespace Ataker
             {
                 for (int x = 0; x < GridWidth; x++)
                 {
-                    Rectangle tile = new Rectangle(x * TileSize, y * TileSize, TileSize, TileSize);
+                    for (int l = 0; l < Layer; l++)
+                    {
+                        Rectangle tile = new Rectangle(x * TileSize, y * TileSize, TileSize, TileSize);
 
-                    if (grid[x, y] is Wall)
-                        g.FillRectangle(Brushes.DarkGray, tile); // Draw wall
-                    else if (grid[x, y] is Player)
-                        g.FillRectangle(Brushes.Red, tile); // Draw player
-                    else if (grid[x, y] is DocumentPile)
-                        g.FillRectangle(Brushes.Blue, tile);
-                    else if (grid[x, y] is Monster)
-                        g.FillRectangle(Brushes.LightBlue, tile);
-                    else
-                        g.DrawRectangle(Pens.Black, tile); // Draw empty grid
+                        if (grid[x, y, l] is Wall)
+                            g.FillRectangle(Brushes.DarkGray, tile); // Draw wall
+                        else if (grid[x, y, l] is Player)
+                            g.FillRectangle(Brushes.Red, tile); // Draw player
+                        else if (grid[x, y, l] is DocumentPile)
+                            g.FillRectangle(Brushes.Blue, tile);
+                        else if (grid[x, y, l] is Monster)
+                            g.FillRectangle(Brushes.LightBlue, tile);
+                        else if (grid[x, y, l] is Trap)
+                            g.FillRectangle(Brushes.LightPink, tile);
+                        else if (l == 0) // layer 0 วาด grid
+                            g.DrawRectangle(Pens.Black, tile); // Draw empty grid
+                    }
                 }
             }
         }

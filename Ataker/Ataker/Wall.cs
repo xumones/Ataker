@@ -6,12 +6,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-public class Wall : GameObject
+namespace Ataker
 {
-    public Wall(int x, int y) : base(x, y) { }
-
-    public override void Draw(Graphics g, int tileSize)
+    public class Wall : GameObject
     {
-        g.FillRectangle(Brushes.DarkGray, X * tileSize, Y * tileSize, tileSize, tileSize); // Wall สีเทา
+        public Wall(int x, int y, int z) : base(x, y, z) { }
+
+        public override void Draw(Graphics g, int tileSize)
+        {
+            g.FillRectangle(Brushes.DarkGray, X * tileSize, Y * tileSize, tileSize, tileSize); // Wall สีเทา
+        }
     }
 }
