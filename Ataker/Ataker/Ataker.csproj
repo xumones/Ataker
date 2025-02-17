@@ -54,8 +54,6 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="GameObject.cs" />
-    <Compile Include="Level.cs" />
-    <Compile Include="LevelManager.cs" />
     <Compile Include="Monster.cs" />
     <Compile Include="Moveable.cs" />
     <Compile Include="Player.cs" />
