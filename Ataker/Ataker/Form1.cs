@@ -7,13 +7,12 @@ namespace Ataker
 {
     public partial class Form1 : Form
     {
-        private const int GridWidth = 14;
-        private const int GridHeight = 7;
+        private int currentLevel = 1;
         private const int Layer = 2;
         private const int TileSize = 110;
+        private LevelManager levelManager = new LevelManager();
 
-        private GameObject[,,] grid = new GameObject[GridWidth, GridHeight, Layer];
-        private Player player;
+        private GameObject[,,] grid;
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -28,22 +27,20 @@ namespace Ataker
             this.KeyPreview = true;
             this.KeyDown += OnKeyDown;
 
-            InitializeGrid();
+            LoadLevel();
         }
 
-        private void InitializeGrid()
+        private void LoadLevel()
         {
-            // Create player
-            //player = new Player(1, 3, 1);
-            //grid[player.X, player.Y, 1] = player;
+            levelManager.LoadSize(currentLevel);
 
-            ////Create ProfLittle
-            //grid[7, 1, 1] = new ProfLittle(7, 1, 1);
+            grid = new GameObject[levelManager.GridWidth, levelManager.GridHeight, Layer];
 
+            levelManager.ClearGrid(grid);
+            levelManager.LoadLevel(currentLevel, grid);
 
-            LoadLevel(1);
-
-            Invalidate(); // Redraw the form
+            Console.WriteLine("{0} {1}", levelManager.GridWidth, levelManager.GridHeight);
+            Invalidate();
         }
 
         private void OnKeyDown(object sender, KeyEventArgs e)
@@ -56,57 +53,17 @@ namespace Ataker
                 case Keys.S: deltaY = 1; break;
                 case Keys.A: deltaX = -1; break;
                 case Keys.D: deltaX = 1; break;
-                case Keys.R: ClearGrid();
-                             LoadLevel(1);
-                             Invalidate();
-                             break;
+                case Keys.R: LoadLevel(); break;
+                case Keys.P:
+                    currentLevel = 2;
+                    LoadLevel();
+                    break;
                 default: return;
             }
 
-            if (player.Move(deltaX, deltaY, 1, grid))
+            if (levelManager.player.Move(deltaX, deltaY, 1, grid))
             {
                 Invalidate(); // Redraw screen after move
-            }
-        }
-
-        private void ClearGrid()
-        {
-            for (int y = 0; y < GridHeight; y++)
-            {
-                for (int x = 0; x < GridWidth; x++)
-                {
-                    for (int l = 0; l < 2; l++)
-                    {
-                        grid[x, y, l] = null;
-                    }
-                }
-            }
-        }
-        private void LoadLevel(int levelNum)
-        {
-            int[,] levelData = {
-            {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-            {1, 1, 0, 0, 3, 0, 1, 5, 0, 0, 0, 0, 1, 1},
-            {1, 0, 4, 2, 0, 2, 0, 1, 2, 3, 0, 2, 0, 1},
-            {1, 6, 0, 3, 0, 0, 2, 4, 0, 1, 2, 0, 1, 1},
-            {1, 0, 1, 2, 2, 0, 0, 2, 0, 3, 0, 1, 1, 1},
-            {1, 0, 0, 3, 0, 1, 0, 3, 2, 0, 1, 1, 1, 1},
-            {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
-
-            for (int y = 0; y < GridHeight; y++)
-            {
-                for (int x = 0; x < GridWidth; x++)
-                {
-                    switch (levelData[y, x])
-                    {
-                        case 1: grid[x, y, 1] = new Wall(x, y, 1); break;
-                        case 2: grid[x, y, 1] = new DocumentPile(x, y, 1); break;
-                        case 3: grid[x, y, 0] = new Trap(x, y, 0); break;
-                        case 4: grid[x, y, 1] = new Monster(x, y, 1, 3); break;
-                        case 5: grid[x, y, 1] = new ProfLittle(x, y, 1); break;
-                        case 6: grid[x, y, 1] = player = new Player(x, y, 1); break;
-                    }
-                }
             }
         }
 
@@ -115,9 +72,9 @@ namespace Ataker
             base.OnPaint(e);
             Graphics g = e.Graphics;
 
-            for (int y = 0; y < GridHeight; y++)
+            for (int y = 0; y < levelManager.GridHeight; y++)
             {
-                for (int x = 0; x < GridWidth; x++)
+                for (int x = 0; x < levelManager.GridWidth; x++)
                 {
                     for (int l = 0; l < Layer; l++)
                     {
