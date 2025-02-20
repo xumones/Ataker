@@ -10,6 +10,7 @@ namespace Ataker
     public class Player : GameObject, Moveable
     {
         public Action OnLevelUp;
+        private bool keyIsPick;
         public Player(int x, int y, int z) : base(x, y, z)
         {
 
@@ -49,6 +50,22 @@ namespace Ataker
                 return true;
             }
 
+            if (grid[newX, newY, layer] is Key key)
+            {
+                Console.WriteLine("Key Picked!");
+                keyIsPick = true; 
+                key.KeyPick(grid);
+            }
+
+            if(grid[newX, newY, layer] is Locker locker)
+            {
+                if(keyIsPick)
+                {
+                    grid[locker.X, locker.Y, layer] = null;
+                }
+                return true;
+            }
+
             // Check if it empty space
             if (grid[newX, newY, layer] == null)
             {
@@ -72,10 +89,9 @@ namespace Ataker
             }
 
             // Check if that place is a wall (NOT EMPTY SPACE , NOT DOCUMENTPILE, NOT MONSTER = wall) (Grid edge already check)
-            if (grid[newX, newY, layer] != null && !(grid[newX, newY, layer] is DocumentPile) && !(grid[newX, newY, layer] is Monster)
-                                                && !(grid[newX, newY, layer] is ProfLittle))
+            if (grid[newX, newY, layer] != null && (grid[newX, newY, layer] is Wall))
             {
-                Console.WriteLine("Obstacle detected.");
+                Console.WriteLine("Wall detected.");
                 return true;
             }
 

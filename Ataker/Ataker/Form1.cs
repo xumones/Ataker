@@ -98,6 +98,10 @@ namespace Ataker
                             g.FillRectangle(Brushes.LightPink, tile);
                         else if (grid[x, y, l] is ProfLittle)
                             g.FillRectangle(Brushes.Yellow, tile);
+                        else if (grid[x, y, l] is Locker)
+                            g.FillRectangle(Brushes.DarkGreen, tile);
+                        else if (grid[x, y, l] is Key)
+                            g.FillRectangle(Brushes.LightGreen, tile);
                         else if (l == 0) // layer 0 draw grid
                             g.DrawRectangle(Pens.Black, tile); // Draw empty grid
                     }

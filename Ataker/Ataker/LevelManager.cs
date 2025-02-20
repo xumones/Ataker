@@ -54,8 +54,8 @@ namespace Ataker
             {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
             {1, 1, 0, 0, 3, 0, 1, 5, 0, 0, 0, 0, 1, 1},
             {1, 0, 4, 2, 0, 2, 0, 1, 2, 3, 0, 2, 0, 1},
-            {1, 6, 0, 3, 0, 0, 2, 4, 0, 1, 2, 0, 1, 1},
-            {1, 0, 1, 2, 2, 0, 0, 2, 0, 3, 0, 1, 1, 1},
+            {1, 6, 7, 3, 0, 0, 2, 4, 0, 1, 2, 0, 1, 1},
+            {1, 8, 1, 2, 2, 0, 0, 2, 0, 3, 0, 1, 1, 1},
             {1, 0, 0, 3, 0, 1, 0, 3, 2, 0, 1, 1, 1, 1},
             {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
             }
@@ -77,6 +77,8 @@ namespace Ataker
                         case 4: grid[x, y, 1] = new Monster(x, y, 1, 3); break;
                         case 5: grid[x, y, 1] = new ProfLittle(x, y, 1); break;
                         case 6: grid[x, y, 1] = player = new Player(x, y, 1); break;
+                        case 7: grid[x, y, 1] = new Locker(x, y, 1); break;
+                        case 8: grid[x, y, 1] = new Key(x, y, 1); break;
                     }
                 }
             }
