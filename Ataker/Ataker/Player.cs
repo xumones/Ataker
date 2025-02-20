@@ -9,6 +9,7 @@ namespace Ataker
 {
     public class Player : GameObject, Moveable
     {
+        public Action OnLevelUp;
         public Player(int x, int y, int z) : base(x, y, z)
         {
 
@@ -41,6 +42,13 @@ namespace Ataker
                 return true;
             }
 
+            if (grid[newX, newY, layer] is ProfLittle prof)
+            {
+                Console.WriteLine("load");
+                RequestLevelUp();
+                return true;
+            }
+
             // Check if it empty space
             if (grid[newX, newY, layer] == null)
             {
@@ -64,7 +72,8 @@ namespace Ataker
             }
 
             // Check if that place is a wall (NOT EMPTY SPACE , NOT DOCUMENTPILE, NOT MONSTER = wall) (Grid edge already check)
-            if (grid[newX, newY, layer] != null && !(grid[newX, newY, layer] is DocumentPile) && !(grid[newX, newY, layer] is Monster))
+            if (grid[newX, newY, layer] != null && !(grid[newX, newY, layer] is DocumentPile) && !(grid[newX, newY, layer] is Monster)
+                                                && !(grid[newX, newY, layer] is ProfLittle))
             {
                 Console.WriteLine("Obstacle detected.");
                 return true;
@@ -76,6 +85,11 @@ namespace Ataker
         public override void Draw(Graphics g, int tileSize)
         {
             g.FillRectangle(Brushes.Red, X * tileSize, Y * tileSize, tileSize, tileSize); // Draw player as a red rectangle
+        }
+
+        public void RequestLevelUp()
+        {
+            OnLevelUp?.Invoke();
         }
     }
 }

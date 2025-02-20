@@ -7,12 +7,12 @@ namespace Ataker
 {
     public partial class Form1 : Form
     {
-        private int currentLevel = 1;
         private const int Layer = 2;
-        private const int TileSize = 110;
         private LevelManager levelManager = new LevelManager();
+        private int currentLevel = 1;
 
         private GameObject[,,] grid;
+        private Player player;
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -33,11 +33,20 @@ namespace Ataker
         private void LoadLevel()
         {
             levelManager.LoadSize(currentLevel);
+            Console.WriteLine(currentLevel.ToString());
 
             grid = new GameObject[levelManager.GridWidth, levelManager.GridHeight, Layer];
 
             levelManager.ClearGrid(grid);
             levelManager.LoadLevel(currentLevel, grid);
+
+            player = levelManager.player;
+            player.OnLevelUp = () =>
+            {
+                Console.WriteLine("Next level");
+                currentLevel++;
+                LoadLevel();
+            };
 
             Console.WriteLine("{0} {1}", levelManager.GridWidth, levelManager.GridHeight);
             Invalidate();
@@ -54,10 +63,7 @@ namespace Ataker
                 case Keys.A: deltaX = -1; break;
                 case Keys.D: deltaX = 1; break;
                 case Keys.R: LoadLevel(); break;
-                case Keys.P:
-                    currentLevel = 2;
-                    LoadLevel();
-                    break;
+                case Keys.X: Application.Exit(); break;
                 default: return;
             }
 
@@ -78,8 +84,8 @@ namespace Ataker
                 {
                     for (int l = 0; l < Layer; l++)
                     {
-                        Rectangle tile = new Rectangle(x * TileSize, y * TileSize, TileSize, TileSize);
-
+                        Rectangle tile = new Rectangle(x * levelManager.TileSize, y * levelManager.TileSize,
+                                                           levelManager.TileSize, levelManager.TileSize);
                         if (grid[x, y, l] is Wall)
                             g.FillRectangle(Brushes.DarkGray, tile);
                         else if (grid[x, y, l] is Player)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Ataker
 {
@@ -10,7 +11,7 @@ namespace Ataker
     {
         public int GridWidth { get; set; }
         public int GridHeight { get; set; }
-        public int TileSize { get; set; } = 110;
+        public int TileSize { get; set; }
         public Player player { get; set; }
 
 
@@ -20,11 +21,13 @@ namespace Ataker
             {
                 GridWidth = 10;
                 GridHeight = 5;
+                TileSize = 154;
             }
             else if (levelNumber == 2)
             {
                 GridWidth = 14;
                 GridHeight = 7;
+                TileSize = 110;
             }
         }
 
@@ -40,9 +43,9 @@ namespace Ataker
             {
                 return new int[,] {
             {1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-            {1, 0, 0, 1, 1, 1, 1, 1, 1, 1 },
-            {1, 6, 0, 1, 1, 1, 1, 1, 1, 1 },
-            {1, 0, 0, 1, 1, 1, 1, 1, 1, 1 },
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            {1, 6, 0, 0, 0, 0, 0, 0, 5, 1 },
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
             {1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }};
             }
             else if (levelNumber == 2)
