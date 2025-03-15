@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,11 +10,15 @@ namespace Ataker
 {
     public class DocumentPile : GameObject , Moveable
     {
-        public DocumentPile(int x, int y, int z) : base(x, y, z) { }
+        private Image sprite;
+        public DocumentPile(int x, int y, int z) : base(x, y, z) 
+        {
+            sprite = Image.FromFile(@".\Assets\TableSprite2.png");
+        } 
 
         public override void Draw(Graphics g, int tileSize)
         {
-            g.FillRectangle(Brushes.Blue, X * tileSize, Y * tileSize, tileSize, tileSize); // Doc -> Blue
+            g.DrawImage(sprite, X * tileSize, Y * tileSize, tileSize, tileSize);
         }
 
         public bool Move(int deltaX, int deltaY, int layer, GameObject[,,] grid)

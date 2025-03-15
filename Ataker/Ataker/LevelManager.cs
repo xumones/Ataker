@@ -12,6 +12,7 @@ namespace Ataker
         public int GridWidth { get; set; }
         public int GridHeight { get; set; }
         public int TileSize { get; set; }
+        public string BackgroundPath { get; private set; }
         public Player player { get; set; }
 
 
@@ -22,12 +23,14 @@ namespace Ataker
                 GridWidth = 10;
                 GridHeight = 5;
                 TileSize = 154;
+                BackgroundPath = @".\Assets\BG1.png";
             }
             else if (levelNumber == 2)
             {
                 GridWidth = 14;
                 GridHeight = 7;
                 TileSize = 110;
+                BackgroundPath = @".\Assets\BG2.png";
             }
         }
 
@@ -44,7 +47,7 @@ namespace Ataker
                 return new int[,] {
             {1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
             {1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-            {1, 6, 0, 0, 0, 0, 0, 0, 5, 1 },
+            {1, 6, 0, 0, 2, 0, 0, 0, 5, 1 },
             {1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
             {1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }};
             }
@@ -52,10 +55,10 @@ namespace Ataker
             {
                 return new int[,] {
             {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-            {1, 1, 0, 0, 3, 0, 1, 5, 0, 0, 0, 0, 1, 1},
+            {1, 1, 0, 0, 3, 8, 1, 5, 7, 0, 0, 0, 1, 1},
             {1, 0, 4, 2, 0, 2, 0, 1, 2, 3, 0, 2, 0, 1},
-            {1, 6, 7, 3, 0, 0, 2, 4, 0, 1, 2, 0, 1, 1},
-            {1, 8, 1, 2, 2, 0, 0, 2, 0, 3, 0, 1, 1, 1},
+            {1, 6, 0, 3, 0, 0, 2, 4, 0, 1, 2, 0, 1, 1},
+            {1, 0, 1, 2, 2, 0, 0, 2, 0, 3, 0, 1, 1, 1},
             {1, 0, 0, 3, 0, 1, 0, 3, 2, 0, 1, 1, 1, 1},
             {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
             }

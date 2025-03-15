@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using System.Threading.Tasks;
 
 namespace Ataker
@@ -11,9 +12,19 @@ namespace Ataker
     {
         public Action OnLevelUp;
         private bool keyIsPick;
+
+        //private static Image spriteSheet = Image.FromFile("./Assets/Playertest.png"); // โหลด Sprite Sheet
+        //private int currentFrame = 0;
+        //private int frameWidth = 32;  // กว้างของ 1 เฟรม
+        //private int frameHeight = 32; // สูงของ 1 เฟรม
+        //private int direction = 0; // 0 = ลง, 1 = ซ้าย, 2 = ขวา, 3 = ขึ้น
+        //private Timer animationTimer;
+
         public Player(int x, int y, int z) : base(x, y, z)
         {
-
+            //animationTimer = new Timer();
+            //animationTimer.Interval = 100; // 100ms ต่อเฟรม
+            //animationTimer.Tick += (s, e) => NextFrame();
         }
 
         public bool Move(int deltaX, int deltaY, int layer, GameObject[,,] grid)
@@ -27,6 +38,12 @@ namespace Ataker
                 Console.WriteLine("Collision detected, can't move.");
                 return false;
             }
+
+            //Direction Control
+            //if (deltaX == -1) direction = 1;  // ซ้าย
+            //if (deltaX == 1) direction = 2;   // ขวา
+            //if (deltaY == -1) direction = 3;  // ขึ้น
+            //if (deltaY == 1) direction = 0;   // ลง
 
             // Check if it DocumentPile or not
             if (grid[newX, newY, layer] is DocumentPile doc)

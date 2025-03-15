@@ -14,7 +14,7 @@ namespace Ataker
 
         public override void Draw(Graphics g, int tileSize)
         {
-            g.FillRectangle(Brushes.DarkGray, X * tileSize, Y * tileSize, tileSize, tileSize); // Wall สีเทา
+            g.FillRectangle(Brushes.Transparent, X * tileSize, Y * tileSize, tileSize, tileSize);
         }
     }
 }

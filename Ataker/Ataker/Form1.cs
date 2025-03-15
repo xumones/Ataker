@@ -9,6 +9,7 @@ namespace Ataker
     {
         private const int Layer = 2;
         private LevelManager levelManager = new LevelManager();
+        private Image background;
         private int currentLevel = 1;
 
         private GameObject[,,] grid;
@@ -27,6 +28,12 @@ namespace Ataker
             this.KeyPreview = true;
             this.KeyDown += OnKeyDown;
 
+            this.FormBorderStyle = FormBorderStyle.None;  // เอาขอบหน้าต่างออก
+            this.MaximizeBox = false;  // ปิดปุ่มขยาย
+            this.MinimizeBox = false;  // ปิดปุ่มย่อ
+            this.StartPosition = FormStartPosition.CenterScreen;  // ตั้งตำแหน่งให้ตรงกลางหน้าจอ
+            this.WindowState = FormWindowState.Maximized;
+
             LoadLevel();
         }
 
@@ -39,6 +46,16 @@ namespace Ataker
 
             levelManager.ClearGrid(grid);
             levelManager.LoadLevel(currentLevel, grid);
+
+            //load background from class levelmanager
+            if (!string.IsNullOrEmpty(levelManager.BackgroundPath) && System.IO.File.Exists(levelManager.BackgroundPath))
+            {
+                background = Image.FromFile(levelManager.BackgroundPath);
+            }
+            else
+            {
+                background = null;
+            }
 
             player = levelManager.player;
             player.OnLevelUp = () =>
@@ -73,10 +90,16 @@ namespace Ataker
             }
         }
 
+
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
             Graphics g = e.Graphics;
+
+            if (background != null)
+            {
+                g.DrawImage(background, 0, 0, this.ClientSize.Width, this.ClientSize.Height);
+            }
 
             for (int y = 0; y < levelManager.GridHeight; y++)
             {
@@ -86,24 +109,34 @@ namespace Ataker
                     {
                         Rectangle tile = new Rectangle(x * levelManager.TileSize, y * levelManager.TileSize,
                                                            levelManager.TileSize, levelManager.TileSize);
-                        if (grid[x, y, l] is Wall)
-                            g.FillRectangle(Brushes.DarkGray, tile);
-                        else if (grid[x, y, l] is Player)
-                            g.FillRectangle(Brushes.Red, tile);
-                        else if (grid[x, y, l] is DocumentPile)
-                            g.FillRectangle(Brushes.Blue, tile);
-                        else if (grid[x, y, l] is Monster)
-                            g.FillRectangle(Brushes.LightBlue, tile);
-                        else if (grid[x, y, l] is Trap)
-                            g.FillRectangle(Brushes.LightPink, tile);
-                        else if (grid[x, y, l] is ProfLittle)
-                            g.FillRectangle(Brushes.Yellow, tile);
-                        else if (grid[x, y, l] is Locker)
-                            g.FillRectangle(Brushes.DarkGreen, tile);
-                        else if (grid[x, y, l] is Key)
-                            g.FillRectangle(Brushes.LightGreen, tile);
-                        else if (l == 0) // layer 0 draw grid
-                            g.DrawRectangle(Pens.Black, tile); // Draw empty grid
+                        var obj = grid[x, y, l];
+
+                        if (obj != null)
+                        {
+                            obj.Draw(g, levelManager.TileSize); // Call draw in object
+                        }
+                        else if (l == 0) //layer 0 draw grid
+                        {
+                            g.DrawRectangle(Pens.Black, tile);  // วาดกริดถ้าตำแหน่งนั้นว่าง
+                        }
+                        //if (grid[x, y, l] is Wall)
+                        //    g.FillRectangle(Brushes.DarkGray, tile);
+                        //else if (grid[x, y, l] is Player)
+                        //    g.FillRectangle(Brushes.Red, tile);
+                        //else if (grid[x, y, l] is DocumentPile)
+                        //    g.FillRectangle(Brushes.Blue, tile);
+                        //else if (grid[x, y, l] is Monster)
+                        //    g.FillRectangle(Brushes.LightBlue, tile);
+                        //else if (grid[x, y, l] is Trap)
+                        //    g.FillRectangle(Brushes.LightPink, tile);
+                        //else if (grid[x, y, l] is ProfLittle)
+                        //    g.FillRectangle(Brushes.Yellow, tile);
+                        //else if (grid[x, y, l] is Locker)
+                        //    g.FillRectangle(Brushes.DarkGreen, tile);
+                        //else if (grid[x, y, l] is Key)
+                        //    g.FillRectangle(Brushes.LightGreen, tile);
+                        //else if (l == 0) // layer 0 draw grid
+                        //    g.DrawRectangle(Pens.Black, tile); // Draw empty grid
                     }
                 }
             }
