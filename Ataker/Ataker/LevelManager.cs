@@ -14,7 +14,9 @@ namespace Ataker
         public int TileSize { get; set; }
         public string BackgroundPath { get; private set; }
         public Player player { get; set; }
+        public int LevelStamina { get; private set; }
 
+        public bool isGameEnd = false;
 
         public void LoadSize(int levelNumber)
         {
@@ -23,6 +25,7 @@ namespace Ataker
                 GridWidth = 10;
                 GridHeight = 5;
                 TileSize = 154;
+                LevelStamina = 20;
                 BackgroundPath = @".\Assets\BG1.png";
             }
             else if (levelNumber == 2)
@@ -30,7 +33,25 @@ namespace Ataker
                 GridWidth = 14;
                 GridHeight = 7;
                 TileSize = 110;
+                LevelStamina = 27;
                 BackgroundPath = @".\Assets\BG2.png";
+            }
+            else if (levelNumber == 3)
+            {
+                GridWidth = 14;
+                GridHeight = 7;
+                TileSize = 110;
+                LevelStamina = 44;
+                BackgroundPath = @".\Assets\BG3.png";
+            }
+            else if (levelNumber == 4)
+            {
+                isGameEnd = true;
+                GridWidth = 2;
+                GridHeight = 2;
+                TileSize = 0;
+                LevelStamina = -1;
+                BackgroundPath = @".\Assets\BGEND.png";
             }
         }
 
@@ -46,9 +67,9 @@ namespace Ataker
             {
                 return new int[,] {
             {1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-            {1, 6, 0, 0, 2, 0, 0, 0, 5, 1 },
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            {1, 1, 4, 3, 0, 0, 3, 0, 0, 1 },
+            {1, 6, 2, 2, 1, 2, 2, 2, 5, 1 },
+            {1, 0, 3, 0, 1, 3, 0, 0, 1, 1 },
             {1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }};
             }
             else if (levelNumber == 2)
@@ -61,6 +82,23 @@ namespace Ataker
             {1, 0, 1, 2, 2, 0, 0, 2, 0, 3, 0, 1, 1, 1},
             {1, 0, 0, 3, 0, 1, 0, 3, 2, 0, 1, 1, 1, 1},
             {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
+            }
+            else if (levelNumber == 3)
+            {
+                return new int[,] {
+            {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+            {1, 8, 0, 3, 0, 2, 1, 0, 0, 3, 4, 0, 6, 1},
+            {1, 1, 1, 4, 2, 3, 3, 2, 1, 2, 1, 4, 1, 1},
+            {1, 4, 0, 2, 0, 0, 3, 2, 0, 0, 2, 0, 0, 1},
+            {1, 0, 3, 0, 1, 0, 3, 1, 2, 0, 2, 1, 0, 1},
+            {1, 0, 0, 0, 2, 0, 0, 3, 0, 0, 0, 7, 5, 1},
+            {1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1}};
+            }
+            else if (levelNumber == 4)
+            {
+                return new int[,] {
+            { 0, 0 },
+            { 0, 0 }};
             }
 
             return new int[0, 0]; // Incase stage not found
@@ -79,7 +117,7 @@ namespace Ataker
                         case 3: grid[x, y, 0] = new Trap(x, y, 0); break;
                         case 4: grid[x, y, 1] = new Monster(x, y, 1, 3); break;
                         case 5: grid[x, y, 1] = new ProfLittle(x, y, 1); break;
-                        case 6: grid[x, y, 1] = player = new Player(x, y, 1); break;
+                        case 6: grid[x, y, 1] = player = new Player(x, y, 1, LevelStamina); break;
                         case 7: grid[x, y, 1] = new Locker(x, y, 1); break;
                         case 8: grid[x, y, 1] = new Key(x, y, 1); break;
                     }

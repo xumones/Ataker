@@ -9,13 +9,14 @@ namespace Ataker
 {
     public class ProfLittle : GameObject
     {
+        private Image sprite;
         public ProfLittle(int x, int y, int z) : base(x, y, z)
         {
-
+            sprite = Image.FromFile(@".\Assets\BossSprite.png");
         }
         public override void Draw(Graphics g, int tileSize)
         {
-            g.FillRectangle(Brushes.Yellow, X * tileSize, Y * tileSize, tileSize, tileSize); // Prof สีเหลือง
+            g.DrawImage(sprite, X * tileSize, Y * tileSize, tileSize, tileSize);
         }
     }
 }

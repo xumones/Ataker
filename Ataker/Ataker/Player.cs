@@ -10,27 +10,115 @@ namespace Ataker
 {
     public class Player : GameObject, Moveable
     {
+        public int stamina;
+        public bool isDie = false;
         public Action OnLevelUp;
+
         private bool keyIsPick;
 
-        //private static Image spriteSheet = Image.FromFile("./Assets/Playertest.png"); // โหลด Sprite Sheet
-        //private int currentFrame = 0;
-        //private int frameWidth = 32;  // กว้างของ 1 เฟรม
-        //private int frameHeight = 32; // สูงของ 1 เฟรม
-        //private int direction = 0; // 0 = ลง, 1 = ซ้าย, 2 = ขวา, 3 = ขึ้น
-        //private Timer animationTimer;
+        private Dictionary<string, Image> animations = new Dictionary<string, Image>(); // เก็บหลายอนิเมชัน
+        private string currentAnimation = "Idle"; // อนิเมชันที่ใช้อยู่ตอนนี้
 
-        public Player(int x, int y, int z) : base(x, y, z)
+        private int currentFrame = 0;
+        private int frameWidth = 640, frameHeight = 640;
+        private int totalFrames = 10;
+
+        private bool isMoving = false;
+        private float moveProgress = 0.0f;
+        private int startX, startY, targetX, targetY;
+        private Timer moveTimer;
+
+        private GameObject[,,] gridRef;
+
+        private Timer blinkTimer;
+        private int blinkCount = 0;
+        private bool isVisible = true;
+
+
+        private bool isFaceRight = true;
+
+        public Player(int x, int y, int z, int initialStamina) : base(x, y, z)
         {
-            //animationTimer = new Timer();
-            //animationTimer.Interval = 100; // 100ms ต่อเฟรม
-            //animationTimer.Tick += (s, e) => NextFrame();
+            animations["Idle"] = Image.FromFile(@".\Assets\PlayerIdleSheet.png");
+            animations["Walk"] = Image.FromFile(@".\Assets\PlayerWalkSheet.png");
+            animations["Die"] = Image.FromFile(@".\Assets\PlayerDieSpriteSheet.png");
+
+
+            stamina = initialStamina;
+
+            startX = x; startY = y; targetX = x; targetY = y;
+
+            moveTimer = new Timer();
+            moveTimer.Interval = 1; // ปรับค่าให้เหมาะสม (ค่าที่น้อยกว่าจะทำให้เดินเร็วขึ้น)
+            moveTimer.Tick += MoveStep;
+
+            blinkTimer = new Timer { Interval = 100 }; // กระพริบทุก 100ms
+            blinkTimer.Tick += BlinkEffect;
+        }
+
+        private void BlinkEffect(object sender, EventArgs e)
+        {
+            isVisible = !isVisible; // สลับสถานะ On/Off
+            blinkCount++;
+
+            if (blinkCount >= 4) // กระพริบ 3 ครั้ง
+            {
+                blinkTimer.Stop();
+                isVisible = true; // กลับมาเป็นปกติ
+            }
+        }
+
+        public void SetAnimation(string animationName, int frameCount)
+        {
+            if (animations.ContainsKey(animationName) && currentAnimation != animationName)
+            {
+                currentAnimation = animationName;
+                totalFrames = frameCount;
+                currentFrame = 0; // รีเซ็ตเฟรมเมื่อเปลี่ยนอนิเมชัน
+            }
+        }
+
+        private void NextFrame()
+        {
+            currentFrame = (currentFrame + 1) % totalFrames;
+
+            if (currentAnimation == "Walk" && currentFrame == 0)
+            {
+                SetAnimation("Idle", 10);
+            }
+            if (currentAnimation == "Walk" && currentFrame == 0 && stamina == 0)
+            {
+                SetDieAnimation();
+            }
+        }
+
+        public void SetDieAnimation()
+        {
+            isDie = true;
+            frameWidth = 590; frameHeight = 720;
+            SetAnimation("Die", 21);
         }
 
         public bool Move(int deltaX, int deltaY, int layer, GameObject[,,] grid)
         {
+            if (isDie)
+            {
+                stamina = 0;
+                return false;
+            }
+            if (isMoving) return false;
+
             int newX = X + deltaX;
             int newY = Y + deltaY;
+
+            if (deltaX == 1)
+            {
+                isFaceRight = true;
+            }
+            else if(deltaX == -1)
+            {
+                isFaceRight = false;
+            }
 
             // Check if something block or not
             if (CheckCollision(newX, newY, layer, grid))
@@ -38,12 +126,6 @@ namespace Ataker
                 Console.WriteLine("Collision detected, can't move.");
                 return false;
             }
-
-            //Direction Control
-            //if (deltaX == -1) direction = 1;  // ซ้าย
-            //if (deltaX == 1) direction = 2;   // ขวา
-            //if (deltaY == -1) direction = 3;  // ขึ้น
-            //if (deltaY == 1) direction = 0;   // ลง
 
             // Check if it DocumentPile or not
             if (grid[newX, newY, layer] is DocumentPile doc)
@@ -55,8 +137,9 @@ namespace Ataker
             // Check if it Monster or not
             if (grid[newX, newY, layer] is Monster mon)
             {
+                stamina--;
                 mon.Move(deltaX, deltaY, layer, grid);
-                mon.TakeDamage(layer,grid);
+                mon.TakeDamage(layer, grid);
                 return true;
             }
 
@@ -69,27 +152,51 @@ namespace Ataker
 
             if (grid[newX, newY, layer] is Key key)
             {
+                stamina--;
                 Console.WriteLine("Key Picked!");
-                keyIsPick = true; 
+                keyIsPick = true;
                 key.KeyPick(grid);
             }
 
-            if(grid[newX, newY, layer] is Locker locker)
+            if (grid[newX, newY, 0] is Trap trap)
             {
-                if(keyIsPick)
+                if (stamina == 1) stamina += 1;
+                stamina--;
+                Console.WriteLine("Trap hit!");
+
+                // เริ่มกระพริบs
+                blinkCount = 0;
+                blinkTimer.Start();
+            }
+
+            if (grid[newX, newY, layer] is Locker locker)
+            {
+                if (keyIsPick)
                 {
                     grid[locker.X, locker.Y, layer] = null;
+                    stamina--;
                 }
                 return true;
             }
 
             // Check if it empty space
-            if (grid[newX, newY, layer] == null)
+            if (grid[newX, newY, layer] == null || grid[newX, newY, 0] is Trap)
             {
-                grid[X, Y, layer] = null;
-                X = newX;
-                Y = newY;
-                grid[X, Y, layer] = this;
+                SetAnimation("Walk", 10);
+                stamina--;
+
+                gridRef = grid;
+
+                // เริ่มการเคลื่อนที่แบบลื่นไหล
+                startX = X;
+                startY = Y;
+                targetX = newX;
+                targetY = newY;
+                moveProgress = 0.0f;
+                isMoving = true;
+
+                moveTimer.Start(); // เริ่มให้ Player เคลื่อนที่ทีละนิด
+
                 return true;
             }
 
@@ -115,9 +222,48 @@ namespace Ataker
             return false; // Can move
         }
 
+        private void MoveStep(object sender, EventArgs e)
+        {
+            moveProgress += 0.3f; // ค่าที่มากกว่าจะทำให้เดินเร็วขึ้น
+
+            if (moveProgress >= 1.0f)
+            {
+                moveProgress = 1.0f;
+                moveTimer.Stop();
+                isMoving = false;
+
+                gridRef[X, Y, 1] = null;
+                X = targetX;
+                Y = targetY;
+                gridRef[X, Y, 1] = this;
+            }
+        }
+
         public override void Draw(Graphics g, int tileSize)
         {
-            g.FillRectangle(Brushes.Red, X * tileSize, Y * tileSize, tileSize, tileSize); // Draw player as a red rectangle
+            if (!isVisible) return;
+
+            NextFrame();
+
+            // คำนวณตำแหน่งปัจจุบันระหว่าง Start กับ Target
+            float interpolatedX = startX + (targetX - startX) * moveProgress;
+            float interpolatedY = startY + (targetY - startY) * moveProgress;
+
+            Image spriteSheet = animations[currentAnimation];
+            Rectangle sourceRect = new Rectangle(currentFrame * frameWidth, 0, frameWidth, frameHeight);
+            Rectangle destRect = new Rectangle((int)(interpolatedX * tileSize), (int)(interpolatedY * tileSize), tileSize, tileSize);
+
+            if (!isFaceRight) // ถ้าหันซ้าย ให้ Flip Sprite
+            {
+                g.TranslateTransform(destRect.X + destRect.Width, destRect.Y);
+                g.ScaleTransform(-1, 1);
+                g.DrawImage(spriteSheet, new Rectangle(0, 0, destRect.Width, destRect.Height), sourceRect, GraphicsUnit.Pixel);
+                g.ResetTransform(); // รีเซ็ต Transform เพื่อไม่ให้มีผลกับภาพอื่น
+            }
+            else // ถ้าหันขวา วาดตามปกติ
+            {
+                g.DrawImage(spriteSheet, destRect, sourceRect, GraphicsUnit.Pixel);
+            }
         }
 
         public void RequestLevelUp()

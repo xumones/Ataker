@@ -13,7 +13,7 @@ namespace Ataker
 
         public override void Draw(Graphics g, int tileSize)
         {
-            g.FillRectangle(Brushes.LightPink, X * tileSize, Y * tileSize, tileSize, tileSize); // Trap สีชมพู
+            g.FillRectangle(Brushes.Transparent, X * tileSize, Y * tileSize, tileSize, tileSize); // Trap สีชมพู
         }
     }
 }

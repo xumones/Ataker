@@ -13,7 +13,7 @@ namespace Ataker
         private Image sprite;
         public DocumentPile(int x, int y, int z) : base(x, y, z) 
         {
-            sprite = Image.FromFile(@".\Assets\TableSprite2.png");
+            sprite = Image.FromFile(@".\Assets\TableSprite.png");
         } 
 
         public override void Draw(Graphics g, int tileSize)

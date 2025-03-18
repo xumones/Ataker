@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Reflection.Emit;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Ataker
@@ -15,6 +16,7 @@ namespace Ataker
         private GameObject[,,] grid;
         private Player player;
 
+        private Timer animationTimerUpdate;
         private void Form1_Load(object sender, EventArgs e)
         {
             // Can't delete this
@@ -23,6 +25,13 @@ namespace Ataker
         public Form1()
         {
             InitializeComponent();
+
+            animationTimerUpdate = new Timer();
+            animationTimerUpdate.Interval = 100;
+            animationTimerUpdate.Tick += (s, e) => {
+                this.Invalidate();
+            };
+            animationTimerUpdate.Start();
 
             this.DoubleBuffered = true; // Prevent flickering
             this.KeyPreview = true;
@@ -37,8 +46,22 @@ namespace Ataker
             LoadLevel();
         }
 
+        private async void CheckStamina()
+        {
+            if (player.stamina <= 0)
+            {
+                Console.WriteLine("Stamina depleted! Restarting level...");
+                player.SetDieAnimation();
+
+                await Task.Delay(2175); // รอ 1.5 วินาทีก่อนโหลดด่านใหม่
+
+                LoadLevel(); // โหลด Level ใหม่หลังจากแสดงอนิเมชัน Die
+            }
+        }
+
         private void LoadLevel()
         {
+
             levelManager.LoadSize(currentLevel);
             Console.WriteLine(currentLevel.ToString());
 
@@ -71,6 +94,8 @@ namespace Ataker
 
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
+            if (player.isDie) return;
+
             int deltaX = 0, deltaY = 0;
 
             switch (e.KeyCode)
@@ -86,6 +111,7 @@ namespace Ataker
 
             if (levelManager.player.Move(deltaX, deltaY, 1, grid))
             {
+                CheckStamina();
                 Invalidate(); // Redraw screen after move
             }
         }
@@ -99,6 +125,20 @@ namespace Ataker
             if (background != null)
             {
                 g.DrawImage(background, 0, 0, this.ClientSize.Width, this.ClientSize.Height);
+            }
+
+            if (levelManager.isGameEnd) return;
+
+            string staminaText = $"{player.stamina}";
+            Font font = new Font("Arial", 40, FontStyle.Bold);
+            Brush brush = new SolidBrush(ColorTranslator.FromHtml("#1acd7b"));
+            if (player.stamina < 10)
+            {
+                g.DrawString(staminaText, font, brush, new Point(1080, 771));
+            }
+            else
+            {
+                g.DrawString(staminaText, font, brush, new Point(1064, 771));
             }
 
             for (int y = 0; y < levelManager.GridHeight; y++)
@@ -117,7 +157,7 @@ namespace Ataker
                         }
                         else if (l == 0) //layer 0 draw grid
                         {
-                            g.DrawRectangle(Pens.Black, tile);  // วาดกริดถ้าตำแหน่งนั้นว่าง
+                            g.DrawRectangle(Pens.Transparent, tile);  // วาดกริดถ้าตำแหน่งนั้นว่าง
                         }
                         //if (grid[x, y, l] is Wall)
                         //    g.FillRectangle(Brushes.DarkGray, tile);

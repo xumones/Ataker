@@ -9,15 +9,17 @@ namespace Ataker
 {
     public class Monster : GameObject , Moveable
     {
+        private Image sprite;
         public int health { get; protected set; }
         public Monster(int x, int y, int z,int health) : base(x, y, z) 
         {
             this.health = health;
+            sprite = Image.FromFile(@".\Assets\MonsterSprite.png");
         }
 
         public override void Draw(Graphics g, int tileSize)
         {
-            g.FillRectangle(Brushes.LightBlue, X * tileSize, Y * tileSize, tileSize, tileSize); // Doc สีฟ้าอ่อน
+            g.DrawImage(sprite, X * tileSize - 20, Y * tileSize - 35, tileSize+25, tileSize+25);
         }
 
         public bool Move(int deltaX, int deltaY, int layer,GameObject[,,] grid)
