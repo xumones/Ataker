@@ -9,14 +9,28 @@ namespace Ataker
 {
     public class ProfLittle : GameObject
     {
-        private Image sprite;
+        private Image spriteSheet;
+        private int currentFrame = 0;
+        private int frameWidth = 640;  // ปรับให้ตรงกับขนาดของเฟรม
+        private int frameHeight = 700;
+        private int totalFrames = 5;  // จำนวนเฟรมทั้งหมด
         public ProfLittle(int x, int y, int z) : base(x, y, z)
         {
-            sprite = Image.FromFile(@".\Assets\BossSprite.png");
+            spriteSheet = Image.FromFile(@".\Assets\BossSpriteSheet.png");
         }
+        private void NextFrame()
+        {
+            currentFrame = (currentFrame + 1) % totalFrames;
+        }
+
         public override void Draw(Graphics g, int tileSize)
         {
-            g.DrawImage(sprite, X * tileSize, Y * tileSize, tileSize, tileSize);
+            NextFrame(); // 🔥 เปลี่ยนเฟรมทุกครั้งที่ถูกวาด (ใช้ Timer ใน Form1 แทน)
+
+            Rectangle sourceRect = new Rectangle(currentFrame * frameWidth, 0, frameWidth, frameHeight);
+            Rectangle destRect = new Rectangle(X * tileSize, Y * tileSize, tileSize, tileSize);
+
+            g.DrawImage(spriteSheet, destRect, sourceRect, GraphicsUnit.Pixel);
         }
     }
 }

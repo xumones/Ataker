@@ -16,6 +16,8 @@ namespace Ataker
 
         private bool keyIsPick;
 
+        private bool isAttacking = false;
+
         private Dictionary<string, Image> animations = new Dictionary<string, Image>(); // เก็บหลายอนิเมชัน
         private string currentAnimation = "Idle"; // อนิเมชันที่ใช้อยู่ตอนนี้
 
@@ -42,6 +44,7 @@ namespace Ataker
             animations["Idle"] = Image.FromFile(@".\Assets\PlayerIdleSheet.png");
             animations["Walk"] = Image.FromFile(@".\Assets\PlayerWalkSheet.png");
             animations["Die"] = Image.FromFile(@".\Assets\PlayerDieSpriteSheet.png");
+            animations["Attack"] = Image.FromFile(@".\Assets\PlayerAttackSpriteSheet.png");
 
 
             stamina = initialStamina;
@@ -90,6 +93,11 @@ namespace Ataker
             {
                 SetDieAnimation();
             }
+            if (currentAnimation == "Attack" && currentFrame == totalFrames - 1)
+            {
+                isAttacking = false;
+                SetAnimation("Idle", 10);
+            }
         }
 
         public void SetDieAnimation()
@@ -106,6 +114,9 @@ namespace Ataker
                 stamina = 0;
                 return false;
             }
+
+            if (isAttacking) return false;
+
             if (isMoving) return false;
 
             int newX = X + deltaX;
@@ -127,21 +138,50 @@ namespace Ataker
                 return false;
             }
 
-            // Check if it DocumentPile or not
-            if (grid[newX, newY, layer] is DocumentPile doc)
-            {
-                bool docMoved = doc.Move(deltaX, deltaY, layer, grid);
-                if (!docMoved) return false; // if doc can't move then player can't move too
-            }
-
-            // Check if it Monster or not
             if (grid[newX, newY, layer] is Monster mon)
             {
+                if (isAttacking) return false;
+                SetAnimation("Attack", 10);
+                isAttacking = true;
                 stamina--;
                 mon.Move(deltaX, deltaY, layer, grid);
                 mon.TakeDamage(layer, grid);
                 return true;
             }
+
+            if (grid[newX, newY, 0] is Trap trap && grid[newX, newY, layer] == null)
+            {
+                if (stamina == 1) stamina += 1;
+                Console.WriteLine("Trap hit!");
+
+                // เริ่มกระพริบ
+                blinkCount = 0;
+                blinkTimer.Start();
+            }
+
+            // Check if it DocumentPile or not
+            if (grid[newX, newY, layer] is DocumentPile doc)
+            {
+                bool docMoved = doc.Move(deltaX, deltaY, layer, grid);
+                if (!docMoved) return false; // if doc can't move then player can't move too
+                SetAnimation("Attack", 10);
+                stamina--;
+
+                gridRef = grid;
+
+                // เริ่มการเคลื่อนที่แบบลื่นไหล
+                startX = X;
+                startY = Y;
+                targetX = newX;
+                targetY = newY;
+                moveProgress = 0.0f;
+                isMoving = true;
+
+                moveTimer.Start(); // เริ่มให้ Player เคลื่อนที่ทีละนิด
+                return true;
+            }
+
+            // Check if it Monster or not
 
             if (grid[newX, newY, layer] is ProfLittle prof)
             {
@@ -158,16 +198,6 @@ namespace Ataker
                 key.KeyPick(grid);
             }
 
-            if (grid[newX, newY, 0] is Trap trap)
-            {
-                if (stamina == 1) stamina += 1;
-                stamina--;
-                Console.WriteLine("Trap hit!");
-
-                // เริ่มกระพริบs
-                blinkCount = 0;
-                blinkTimer.Start();
-            }
 
             if (grid[newX, newY, layer] is Locker locker)
             {
@@ -236,6 +266,12 @@ namespace Ataker
                 X = targetX;
                 Y = targetY;
                 gridRef[X, Y, 1] = this;
+
+                if (gridRef[X, Y, 0] is Trap trap)
+                {
+                    stamina--;
+                    Console.WriteLine("Trap hit!");
+                }
             }
         }
 
